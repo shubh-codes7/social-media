@@ -267,8 +267,10 @@ h2{
     justify-content: center;
   }
 
+
   #card{
     margin-inline: auto;
+    width: 100%;
   }
 
   h2{
