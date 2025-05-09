@@ -1,17 +1,3 @@
-// import {useParams} from 'react-router-dom'
-// import {useSelector} from 'react-redux'
-// import CircularProgress from '@mui/material/CircularProgress';
-// import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
-// import ShareIcon from '@mui/icons-material/Share';
-// import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-// import FavoriteIcon from '@mui/icons-material/Favorite';
-// import {Link} from 'react-router-dom'
-// import {useState} from 'react'
-// import Card from './Card.jsx'
-// import {addBookmark, removeBookmark} from '../slices/bookmarkSlice.js'
-// import { useDispatch } from 'react-redux'
-
-
 import { useParams, Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useState, useEffect } from 'react'
@@ -21,6 +7,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import ShareIcon from '@mui/icons-material/Share'
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft'
 import CircularProgress from '@mui/material/CircularProgress'
+import { addNotification } from '../slices/notificationSlice'
 import Card from './Card.jsx'
 
 export default function Post() {
@@ -36,21 +23,39 @@ export default function Post() {
     const [selectedBtn, setSelectedBtn] = useState(1)
     const [like, setLike] = useState(false)
 
-    // Sync like state with Redux bookmark list
+    // Sync like state with Redux
     useEffect(() => {
         const isBookmarked = bookmarks.some(b => b.id === postId)
         setLike(isBookmarked)
-    }, [postId, bookmarks]) // re-check when postId or bookmarks change
+    }, [postId, bookmarks])
 
     if (!post) return <CircularProgress id="loader" />
 
     function handleLikeToggle() {
         if (like) {
             dispatch(removeBookmark(post.id))
-        } else {
-            dispatch(addBookmark(post))
+            dispatch(addNotification({id: post.id, action: "removed", time: new Date().toLocaleString()}))
         }
+        else {
+            dispatch(addBookmark(post))
+            dispatch(addNotification({id: post.id, action: "added", time: new Date().toLocaleString()}))
+        }
+
         setLike(!like)
+    }
+
+    function handleShare() {
+        if (navigator.share) {
+            navigator.share({
+                title: post.title,
+                text: "Check out this post!",
+                url: window.location.href,
+            })
+            .then(() => console.log("Shared successfully"))
+            .catch(err => console.log("Error sharing", err))
+        } else {
+            alert("Sharing not supported in this browser.")
+        }
     }
 
     return (
@@ -66,10 +71,10 @@ export default function Post() {
                     <div className="postIcons">
                         <h5>{post.title.slice(0, 20)}</h5>
                         <div className="flex">
-                            <ShareIcon />
+                            <ShareIcon onClick={handleShare} style={{ cursor: "pointer" }} />
                             {like 
-                                ? <FavoriteIcon style={{ color: "red" }} onClick={handleLikeToggle} /> 
-                                : <FavoriteBorderIcon onClick={handleLikeToggle} />
+                                ? <FavoriteIcon style={{ color: "red", cursor: "pointer" }} onClick={handleLikeToggle}/> 
+                                : <FavoriteBorderIcon style={{ cursor: "pointer" }} onClick={handleLikeToggle} />
                             }
                         </div>
                     </div>

@@ -3,11 +3,11 @@ import Navbar from './components/Navbar.jsx'
 import Post from './components/Post.jsx'
 import Home from './components/Home.jsx'
 import Bookmark from './components/Bookmark.jsx'
+import Notifications from './components/Notifications.jsx'
 
 import {useEffect} from 'react'
 import {useDispatch} from 'react-redux'
 import {fetchPosts} from './slices/postSlice.js'
-// import Profile from './components/Profile.jsx'
 
 function App() {
 
@@ -24,6 +24,7 @@ function App() {
         <Route path="/" element={ <Home /> } />
         <Route path="/item/:id" element={ <Post /> } />        
         <Route path="/bookmarks" element={ <Bookmark /> } />
+        <Route path="/Notifications" element={ <Notifications /> } />
       </Routes>
       
     </div>
